@@ -1,0 +1,116 @@
+Encriptar infromación
+
+SHA-1 o algoritmo hash seguro 1 es un algoritmo criptográfico que toma una entrada y produce un valor hash de 160 bits (20 bytes) . Este valor hash se conoce como resumen del mensaje. Este resumen del mensaje suele representarse como un número hexadecimal de 40 dígitos.
+
+MariaDB [(none)]> select sha1("prueba");
++------------------------------------------+
+| sha1("prueba")                           |
++------------------------------------------+
+| 711383a59fda05336fd2ccf70c8059d1523eb41a |
++------------------------------------------+
+1 row in set (0.000 sec)
+
+
+En criptografía, MD5 (abreviatura de Message-Digest Algorithm 5, Algoritmo de Resumen del Mensaje 5) es un algoritmo de reducción criptográfico de 128 bits ampliamente usado. 
+MD5 (Algoritmo 5 de resumen de mensajes) es una función hash criptográfica ampliamente utilizada que produce unbit valor hash, normalmente expresado como un número hexadecimal de 32 caracteres.
+MariaDB [(none)]> select md5("prueba");
++----------------------------------+
+| md5("prueba")                    |
++----------------------------------+
+| c893bad68927b457dbed39460e6afd62 |
++----------------------------------+
+1 row in set (0.000 sec)
+
+Calcula una cadena contraseña a partir de la cadena en texto plano str. Esta es la función que se usa para encriptar contraseñas MySQL para almacenarlas en las columnas Password de la tabla de concesiones de usuario:
+
+MariaDB [(none)]> select password("prueba");
++-------------------------------------------+
+| password("prueba")                        |
++-------------------------------------------+
+| *7607B582F66376F728D7375683F85F2F20E37320 |
++-------------------------------------------+
+1 row in set (0.000 sec)
+
+MariaDB [(none)]> select password("prueba");
++-------------------------------------------+
+| password("prueba")                        |
++-------------------------------------------+
+| *7607B582F66376F728D7375683F85F2F20E37320 |
++-------------------------------------------+
+1 row in set (0.000 sec)
+
+MariaDB [(none)]> create database prueba;
+Query OK, 1 row affected (0.002 sec)
+
+MariaDB [(none)]> use prueba;
+Database changed
+
+MariaDB [prueba]> create table usuario
+    -> (id varchar(5) not null primary key,
+    -> Usuario varchar(10) not null,
+    -> Clave varchar(40) not null,
+    -> estado varchar(5) not null);
+Query OK, 0 rows affected (0.040 sec)
+
+MariaDB [prueba]> show tables;
++------------------+
+| Tables_in_prueba |
++------------------+
+| usuario          |
++------------------+
+1 row in set (0.000 sec)
+
+MariaDB [prueba]> describe usuario;
++---------+-------------+------+-----+---------+-------+
+| Field   | Type        | Null | Key | Default | Extra |
++---------+-------------+------+-----+---------+-------+
+| id      | varchar(5)  | NO   | PRI | NULL    |       |
+| Usuario | varchar(10) | NO   |     | NULL    |       |
+| Clave   | varchar(40) | NO   |     | NULL    |       |
+| estado  | varchar(5)  | NO   |     | NULL    |       |
++---------+-------------+------+-----+---------+-------+
+4 rows in set (0.008 sec)
+
+MariaDB [prueba]> insert into usuario values('00001','uno',sha1('Abc123'),'A');
+Query OK, 1 row affected (0.040 sec)
+
+MariaDB [prueba]> select  * from usuario;
++-------+---------+------------------------------------------+--------+
+| id    | Usuario | Clave                                    | estado |
++-------+---------+------------------------------------------+--------+
+| 00001 | uno     | bec75d2e4e2acf4f4ab038144c0d862505e52d07 | A      |
++-------+---------+------------------------------------------+--------+
+1 row in set (0.000 sec)
+
+MariaDB [prueba]> insert into usuario values('00002','Dos',md5('Abc123'),'A');
+Query OK, 1 row affected (0.013 sec)
+
+MariaDB [prueba]> insert into usuario values('00003','Tres',password('Abc123'),'A');
+Query OK, 1 row affected, 1 warning (0.003 sec)
+
+MariaDB [prueba]> select  * from usuario;
++-------+---------+------------------------------------------+--------+
+| id    | Usuario | Clave                                    | estado |
++-------+---------+------------------------------------------+--------+
+| 00001 | uno     | bec75d2e4e2acf4f4ab038144c0d862505e52d07 | A      |
+| 00002 | Dos     | 61bd60c60d9fb60cc8fc7767669d40a1         | A      |
+| 00003 | Tres    | *7A8BBCB18A250055A6BB98ECFA33A8174D21950 | A      |
++-------+---------+------------------------------------------+--------+
+3 rows in set (0.000 sec)
+
+MariaDB [prueba]> select usuario, clave from usuario where ususrio='uno' and clave=sha1('Abc123');
+ERROR 1054 (42S22): Unknown column 'ususrio' in 'where clause'
+MariaDB [prueba]> select usuario, clave from usuario where usuario='uno' and clave=sha1('A
+bc123');
++---------+------------------------------------------+
+| usuario | clave                                    |
++---------+------------------------------------------+
+| uno     | bec75d2e4e2acf4f4ab038144c0d862505e52d07 |
++---------+------------------------------------------+
+1 row in set (0.000 sec)
+
+MariaDB [prueba]> select usuario, clave from usuario where usuario='uno' and clave=md5('Ab
+c123');
+Empty set (0.000 sec)
+
+MariaDB [prueba]>
