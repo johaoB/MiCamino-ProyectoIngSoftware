@@ -114,3 +114,10 @@ c123');
 Empty set (0.000 sec)
 
 MariaDB [prueba]>
+
+
+
+
+
+
+no se, el que lo lea es puto
