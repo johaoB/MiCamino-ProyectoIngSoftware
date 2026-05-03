@@ -1,0 +1,7 @@
+# Tecnicas de Elicitacion
+
+Para el levantamiento de requisitos del presente proyecto se emplearon tres técnicas de elicitación complementarias. En primer lugar, se utilizaron encuestas y cuestionarios, aplicados a estudiantes de grados décimo y once de instituciones educativas públicas de Medellín, con el propósito de identificar sus intereses vocacionales, nivel de acceso a herramientas tecnológicas y las principales dificultades que enfrentan al momento de elegir su trayectoria académica y profesional. Esta técnica permitió recopilar información cuantitativa y cualitativa de manera estructurada y en un tiempo reducido.
+
+En segundo lugar, se elaboraron historias de usuario, que permitieron describir de forma clara y centrada en el usuario las funcionalidades esperadas del sistema, expresando las necesidades reales de los estudiantes, orientadores y docentes desde su propia perspectiva. Esto facilitó priorizar los requisitos más relevantes y mantener el enfoque en el valor que el prototipo debe generar para cada tipo de usuario.
+
+Finalmente, se construyeron casos de uso, los cuales permitieron modelar de manera detallada las interacciones entre los usuarios y el sistema, definiendo los flujos principales del prototipo web, como el registro de usuario, la realización del cuestionario de competencias y la visualización del perfil vocacional sugerido. En conjunto, estas tres técnicas garantizaron una comprensión integral de los requisitos funcionales y no funcionales necesarios para el diseño del sistema.
