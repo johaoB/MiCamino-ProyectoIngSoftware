@@ -1,0 +1,156 @@
+/* Aplicamos box-sizing global para tamaños más predecibles. */
+* {
+  box-sizing: border-box;
+}
+
+/* Estilos base de body para una estética limpia del demo. */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f3f5f8;
+  color: #1f2937;
+}
+
+/* Contenedor principal de cada pantalla para centrar contenido. */
+.page-container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 32px 20px 48px;
+}
+
+/* Tarjeta reutilizable para bloques de contenido. */
+.card {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+  padding: 24px;
+}
+
+/* Título principal de pantalla. */
+.page-title {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 2rem;
+  color: #1f2d5a;
+}
+
+/* Texto explicativo general. */
+.page-text {
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+/* Botón principal para acciones primarias. */
+.btn-primary {
+  background: linear-gradient(90deg, #4f46e5, #5b21b6);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Estado hover para feedback visual. */
+.btn-primary:hover {
+  filter: brightness(1.05);
+}
+
+/* Botón deshabilitado. */
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Lista de opciones del cuestionario. */
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* Estilo de cada opción tipo tarjeta clickeable. */
+.option-item {
+  border: 1px solid #d9deea;
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fafbff;
+}
+
+/* Efecto hover para opciones. */
+.option-item:hover {
+  border-color: #7c8cf8;
+}
+
+/* Estilo visual de la opción seleccionada. */
+.option-item.selected {
+  border-color: #4f46e5;
+  background: #eef0ff;
+}
+
+/* Barra de progreso del cuestionario. */
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+  margin: 14px 0 18px;
+}
+
+/* Relleno dinámico de la barra de progreso. */
+.progress-fill {
+  height: 100%;
+  background: #22c55e;
+}
+
+/* Grid para recomendaciones de carreras. */
+.recommendations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+
+/* Tarjeta individual de recomendación. */
+.recommendation-card {
+  border: 1px solid #dbe0ec;
+  border-radius: 12px;
+  padding: 14px;
+  background: #fcfcff;
+}
+
+/* Badge para porcentaje de afinidad. */
+.badge {
+  display: inline-block;
+  margin-top: 10px;
+  background: #e9f8ee;
+  color: #1d7a3b;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+/* Mensaje de estado (error o carga). */
+.state-message {
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+/* Estado de error. */
+.state-message.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Estado informativo. */
+.state-message.info {
+  background: #e0e7ff;
+  color: #1e40af;
+}
