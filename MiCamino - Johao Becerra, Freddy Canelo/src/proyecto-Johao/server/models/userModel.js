@@ -1,128 +1,267 @@
-// ─── Usuarios ────────────────────────────────────────────────
-let users = [
-  { id: 1, name: 'Johao',   email: 'johao@email.com',   password: '1234', role: 'admin' },
-  { id: 2, name: 'Ana',     email: 'ana@email.com',     password: '1234', role: 'usuario',    codigoEstudiante: 'EST-001', institucion: 'IE San José' },
-  { id: 3, name: 'Luis',    email: 'luis@email.com',    password: '1234', role: 'orientador', institucion: 'IE San José' },
-  { id: 4, name: 'Maria',   email: 'maria@email.com',   password: '1234', role: 'profesor',   institucion: 'IE San José' },
-  { id: 5, name: 'Carlos',  email: 'carlos@email.com',  password: '1234', role: 'padre',      codigoVinculo: 'EST-001' },
-];
+/**
+ * userModel.js
+ * Modelo Maestro de Usuario
+ *
+ * Trazabilidad:
+ *  - CU01 – Registrar Estudiante
+ *  - CU02 – Iniciar Sesión como Estudiante
+ *  - CU04 – Validar Registro de Estudiante por Administrador
+ *  - RF-001: Creación de cuentas de usuario
+ *  - RF-002: Inicio de sesión
+ *  - RF-003: Gestión del perfil del estudiante
+ *  - RF-005: Validación institucional
+ *  - Diagrama de Secuencia CU01 (DiagramadeSecuencia.jpeg / DiagramadeSecuencia3.jpeg)
+ *  - Diagrama de Secuencia CU02 (DiagramadeSecuencia2.jpeg)
+ */
 
-// ─── Encuesta simulada ────────────────────────────────────────
-const encuesta = [
-  {
-    id: 1,
-    pregunta: '¿Cuál actividad disfrutas más en clase?',
-    opciones: ['Resolver problemas matemáticos', 'Escribir cuentos o ensayos', 'Hacer experimentos', 'Trabajar en equipo'],
-    correcta: 0,
-    feedback: { bien: 'Tienes perfil analítico, áreas STEM podrían ser tu camino.', mal: 'Considera explorar más actividades lógico-matemáticas.' },
-  },
-  {
-    id: 2,
-    pregunta: '¿Cómo prefieres aprender algo nuevo?',
-    opciones: ['Leyendo y tomando notas', 'Viendo videos y ejemplos', 'Practicando directamente', 'Escuchando a alguien explicar'],
-    correcta: 2,
-    feedback: { bien: 'Aprendes haciendo — perfil práctico muy valorado en ingeniería y tecnología.', mal: 'Un estilo más práctico puede abrirte muchas puertas.' },
-  },
-  {
-    id: 3,
-    pregunta: '¿Qué tipo de problema te motiva más resolver?',
-    opciones: ['Ayudar a personas en dificultades', 'Diseñar algo nuevo y creativo', 'Analizar datos y encontrar patrones', 'Organizar y liderar equipos'],
-    correcta: 2,
-    feedback: { bien: 'Perfil analítico-investigativo, ideal para ciencias o tecnología.', mal: 'Trabajar con datos puede potenciar mucho tu vocación.' },
-  },
-];
+const pool = require('../db/pool');
 
-// ─── Tendencias laborales simuladas ──────────────────────────
-// sector: clasificación económica amplia (CIIU Colombia)
-// clasificacion: subcategoría descriptiva dentro del sector
-const tendenciasLaborales = [
-  {
-    area: 'Tecnología e IA',
-    sector: 'Secundario / Terciario',
-    clasificacion: 'Información y comunicaciones (CIIU J)',
-    demanda: 95,
-    crecimiento: '+40% en 5 años',
-    salarioBase: '$3.500.000',
-  },
-  {
-    area: 'Salud y Medicina',
-    sector: 'Terciario',
-    clasificacion: 'Actividades de atención de la salud humana (CIIU Q)',
-    demanda: 88,
-    crecimiento: '+25% en 5 años',
-    salarioBase: '$4.200.000',
-  },
-  {
-    area: 'Energías Renovables',
-    sector: 'Secundario',
-    clasificacion: 'Suministro de electricidad, gas y agua (CIIU D)',
-    demanda: 82,
-    crecimiento: '+55% en 5 años',
-    salarioBase: '$3.100.000',
-  },
-  {
-    area: 'Educación',
-    sector: 'Terciario',
-    clasificacion: 'Enseñanza y formación académica (CIIU P)',
-    demanda: 74,
-    crecimiento: '+10% en 5 años',
-    salarioBase: '$2.400.000',
-  },
-  {
-    area: 'Finanzas y Economía',
-    sector: 'Terciario',
-    clasificacion: 'Actividades financieras y de seguros (CIIU K)',
-    demanda: 79,
-    crecimiento: '+18% en 5 años',
-    salarioBase: '$3.800.000',
-  },
-  {
-    area: 'Diseño y Creatividad',
-    sector: 'Terciario',
-    clasificacion: 'Actividades artísticas y entretenimiento (CIIU R)',
-    demanda: 70,
-    crecimiento: '+22% en 5 años',
-    salarioBase: '$2.800.000',
-  },
-];
+// ── SELECT base: usuario + rol + institución ──────────────────
+const SELECT_USER = `
+  SELECT
+    u.id_usuario      AS id,
+    u.nombre_completo AS name,
+    u.correo          AS email,
+    u.contrasena      AS password,
+    u.fecha_registro  AS fechaRegistro,
+    u.id_institucion,
+    i.nombre          AS institucion,
+    r.nombre          AS role,
+    r.id_rol,
+    ur_estado.estado  AS estado
+  FROM usuario u
+  JOIN institucion i          ON u.id_institucion = i.id_institucion
+  JOIN usuario_rol ur         ON u.id_usuario = ur.id_usuario
+  JOIN rol r                  ON ur.id_rol = r.id_rol
+  LEFT JOIN (
+    SELECT id_usuario,
+           CASE WHEN COUNT(*) > 0 THEN 'activo' ELSE 'pendiente' END AS estado
+    FROM usuario_rol GROUP BY id_usuario
+  ) ur_estado ON u.id_usuario = ur_estado.id_usuario
+`;
 
-// ─── Resultados de encuesta por estudiante ────────────────────
-let resultadosEncuesta = {};
-// estructura: { [codigoEstudiante]: { fecha, puntaje, total, respuestas: [...] } }
-
-const guardarResultado = (codigo, datos) => {
-  resultadosEncuesta[codigo] = datos;
+/**
+ * getAll
+ * RF-004: Visualización de estudiantes
+ * CU03 Paso 2: sistema muestra lista de estudiantes asignados
+ */
+const getAll = async () => {
+  const [rows] = await pool.query(`
+    SELECT u.id_usuario AS id, u.nombre_completo AS name, u.correo AS email,
+           u.estado, u.fecha_registro AS fechaRegistro,
+           i.nombre AS institucion, r.nombre AS role
+    FROM usuario u
+    JOIN institucion i   ON u.id_institucion = i.id_institucion
+    JOIN usuario_rol ur  ON u.id_usuario = ur.id_usuario
+    JOIN rol r           ON ur.id_rol = r.id_rol
+  `);
+  return rows;
 };
-const obtenerResultado = (codigo) => resultadosEncuesta[codigo] || null;
 
-// ─── CRUD usuarios ────────────────────────────────────────────
-const getAll      = ()      => users;
-const getById     = (id)    => users.find((u) => u.id === id);
-const getByEmail  = (email) => users.find((u) => u.email === email);
-
-const getEstudianteByCode = (codigo) =>
-  users.find((u) => u.role === 'usuario' && u.codigoEstudiante === codigo);
-
-const create = (data) => {
-  const newUser = { id: Date.now(), ...data };
-  users.push(newUser);
-  return newUser;
+/**
+ * getById
+ * RF-003: Gestión del perfil del estudiante
+ * CU03 Paso 5: "El sistema muestra el perfil detallado del estudiante seleccionado"
+ */
+const getById = async (id) => {
+  const [rows] = await pool.query(`
+    SELECT u.id_usuario AS id, u.nombre_completo AS name, u.correo AS email,
+           u.contrasena AS password, u.estado, u.fecha_registro,
+           i.nombre AS institucion, u.id_institucion,
+           r.nombre AS role, r.id_rol
+    FROM usuario u
+    JOIN institucion i   ON u.id_institucion = i.id_institucion
+    JOIN usuario_rol ur  ON u.id_usuario = ur.id_usuario
+    JOIN rol r           ON ur.id_rol = r.id_rol
+    WHERE u.id_usuario = ?
+  `, [id]);
+  return rows[0] || null;
 };
-const update = (id, data) => {
-  const i = users.findIndex((u) => u.id === id);
-  if (i === -1) return null;
-  users[i] = { ...users[i], ...data };
-  return users[i];
+
+/**
+ * getByEmail
+ * CU02 – Iniciar Sesión como Estudiante | RF-002
+ * DS-CU02 Paso 5: obteneDatosSeguridadcorreo) — retorna hash y estado de cuenta
+ *   para verificación: hashGuardado, estadoCuenta, rol, id
+ * Incluye datos de estudiante (grado, grupo) para cargar perfil completo en memoria
+ */
+const getByEmail = async (email) => {
+  const [rows] = await pool.query(`
+    SELECT
+      CAST(u.id_usuario AS UNSIGNED) AS id,
+      u.nombre_completo AS name,
+      u.correo          AS email,
+      u.contrasena      AS password,
+      u.estado,
+      u.fecha_registro,
+      i.nombre          AS institucion,
+      u.id_institucion,
+      r.nombre          AS role,
+      r.id_rol,
+      e.grado,
+      e.grupo
+    FROM usuario u
+    JOIN institucion i     ON u.id_institucion = i.id_institucion
+    JOIN usuario_rol ur    ON u.id_usuario = ur.id_usuario
+    JOIN rol r             ON ur.id_rol = r.id_rol
+    LEFT JOIN estudiante e ON e.id_usuario = u.id_usuario
+    WHERE u.correo = ?
+    ORDER BY ur.id_rol ASC
+    LIMIT 1
+  `, [email]);
+  return rows[0] || null;
 };
-const remove = (id) => {
-  const i = users.findIndex((u) => u.id === id);
-  if (i === -1) return null;
-  return users.splice(i, 1)[0];
+
+/**
+ * getPendientes
+ * CU04 – Validar Registro de Estudiante por Administrador | RF-005
+ * Paso 2: sistema muestra lista de solicitudes con estado 'pendiente'
+ */
+const getPendientes = async () => {
+  const [rows] = await pool.query(`
+    SELECT u.id_usuario AS id, u.nombre_completo AS name, u.correo AS email,
+           u.estado, i.nombre AS institucion, r.nombre AS role
+    FROM usuario u
+    JOIN institucion i   ON u.id_institucion = i.id_institucion
+    JOIN usuario_rol ur  ON u.id_usuario = ur.id_usuario
+    JOIN rol r           ON ur.id_rol = r.id_rol
+    WHERE u.estado = 'pendiente'
+  `);
+  return rows;
+};
+
+/**
+ * getEstudiantesByInst
+ * RF-004: Visualización de estudiantes filtrados por institución
+ * CU03: orientador visualiza estudiantes de su institución
+ */
+const getEstudiantesByInst = async (institucion) => {
+  const [rows] = await pool.query(`
+    SELECT u.id_usuario AS id, u.nombre_completo AS name, u.correo AS email,
+           u.estado, i.nombre AS institucion,
+           e.grado, e.grupo
+    FROM usuario u
+    JOIN institucion i   ON u.id_institucion = i.id_institucion
+    JOIN usuario_rol ur  ON u.id_usuario = ur.id_usuario
+    JOIN rol r           ON ur.id_rol = r.id_rol
+    JOIN estudiante e    ON e.id_usuario = u.id_usuario
+    WHERE i.nombre = ? AND u.estado = 'activo'
+  `, [institucion]);
+  return rows;
+};
+
+/**
+ * create
+ * CU01 – Registrar Estudiante | RF-001
+ * DS-CU01:
+ *   Paso 5  existeUsuario(correo, documento) — verificación implícita por UNIQUE en BD
+ *   Paso 6  new Estudiante(datos, estado='pendiente') — INSERT con estado 'pendiente'
+ *   Paso 7  guardarUsuario(instanciaEstudiante) — commit de la transacción
+ *   Paso 8  registrarAuditoria('Registro', id) — INSERT en usuario_rol
+ *   Paso 9  enviarCorreoConfirmacion(correo) — pendiente de implementación (ServicioCorreo)
+ *   Postcondición 1: cuenta creada con estado 'pendiente de validación'
+ *   Flujo Alterno 5b: ER_DUP_ENTRY → correo o documento ya existen
+ *
+ * La transacción garantiza atomicidad:
+ *   1. Obtener/crear institución
+ *   2. Crear usuario con estado 'pendiente'
+ *   3. Asignar rol
+ *   4. Si es estudiante, crear registro en tabla estudiante
+ */
+const create = async ({ name, email, password, role, institucion, grado, grupo }) => {
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    // DS-CU01: obtener o crear institución (RF-005: validación institucional)
+    let [[inst]] = await conn.query('SELECT id_institucion FROM institucion WHERE nombre = ?', [institucion || 'Sistema (interna)']);
+    if (!inst) {
+      const [r] = await conn.query(
+        'INSERT INTO institucion (nombre, tipo, municipio, estado) VALUES (?, ?, ?, ?)',
+        [institucion, 'Pública', 'Medellín', 'activo']
+      );
+      inst = { id_institucion: r.insertId };
+    }
+
+    // DS-CU01 Paso 6: new Estudiante(datos, estado='pendiente')
+    const [res] = await conn.query(
+      'INSERT INTO usuario (nombre_completo, correo, contrasena, fecha_registro, id_institucion, estado) VALUES (?, ?, ?, NOW(), ?, ?)',
+      [name, email, password, inst.id_institucion, 'pendiente']
+    );
+    const id = res.insertId;
+
+    // DS-CU01 Paso 8: registrarAuditoria — vincular rol (usuario_rol)
+    const [[rolRow]] = await conn.query('SELECT id_rol FROM rol WHERE nombre = ?', [role || 'usuario']);
+    if (!rolRow) throw new Error(`Rol "${role}" no existe`);
+    await conn.query('INSERT INTO usuario_rol (id_usuario, id_rol) VALUES (?, ?)', [id, rolRow.id_rol]);
+
+    // Si el rol es 'usuario' (estudiante), crear registro en tabla estudiante
+    if (role === 'usuario') {
+      await conn.query(
+        'INSERT INTO estudiante (id_usuario, grado, grupo) VALUES (?, ?, ?)',
+        [id, grado || '10°', grupo || 'A']
+      );
+    }
+
+    // DS-CU01 Paso 7: commit — persistencia y auditoría
+    await conn.commit();
+    return { id, name, email, role, institucion, estado: 'pendiente' };
+  } catch (err) {
+    await conn.rollback();
+    throw err;
+  } finally {
+    conn.release();
+  }
+};
+
+/**
+ * updateEstado
+ * CU04 – Validar Registro de Estudiante | RF-005
+ * Paso 5: "El sistema actualiza el estado de la cuenta"
+ *   estado: 'activo' (aprobado) | 'denegado' (rechazado)
+ * Postcondición CU04: cuenta queda 'activa' o 'rechazada'
+ */
+const updateEstado = async (id, estado) => {
+  await pool.query('UPDATE usuario SET estado = ? WHERE id_usuario = ?', [estado, id]);
+  return getById(id);
+};
+
+/**
+ * updatePerfil
+ * RF-003: Gestión del perfil del estudiante — editar información personal y académica
+ * CU03 Paso 6: "El orientador registra observaciones" — también cubre edición propia del usuario
+ */
+const updatePerfil = async (id, { name, email, password }) => {
+  const fields = [];
+  const values = [];
+
+  if (name)     { fields.push('nombre_completo = ?'); values.push(name); }
+  if (email)    { fields.push('correo = ?');           values.push(email); }
+  if (password) { fields.push('contrasena = ?');       values.push(password); }
+
+  if (fields.length === 0) return getById(id);
+
+  values.push(id);
+  await pool.query(
+    `UPDATE usuario SET ${fields.join(', ')} WHERE id_usuario = ?`,
+    values
+  );
+  return getById(id);
+};
+
+/**
+ * remove
+ * RF-006: Configuración de permisos
+ * CU06: administrador puede remover usuarios del sistema
+ */
+const remove = async (id) => {
+  const user = await getById(id);
+  if (!user) return null;
+  await pool.query('DELETE FROM usuario WHERE id_usuario = ?', [id]);
+  return user;
 };
 
 module.exports = {
-  getAll, getById, getByEmail, getEstudianteByCode,
-  create, update, remove,
-  encuesta, tendenciasLaborales,
-  guardarResultado, obtenerResultado,
+  getAll, getById, getByEmail, getPendientes, getEstudiantesByInst,
+  create, updateEstado, updatePerfil, remove,
 };
