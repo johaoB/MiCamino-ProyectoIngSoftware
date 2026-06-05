@@ -1,0 +1,21 @@
+# MATRICES DE TRAZABILIDAD
+**Proyecto: Mi Camino — Orientación Vocacional**
+
+## 9.10 Matriz de Trazabilidad: Diagramas de Secuencia → CU → Clases → Flujos Alternativos
+
+| Diagrama de Secuencia | CU | Clases Involucradas | Flujo Normal | Flujo Alternativo |
+|---|---|---|---|---|
+| DS-01: Registro de Estudiante | CU01 | Usuario, Estudiante, Institucion | El estudiante completa el formulario → el sistema valida datos → crea cuenta → envía confirmación | FA: Correo duplicado → el sistema notifica y bloquea el registro. FA: Institución no válida → el sistema rechaza el registro. |
+| DS-02: Inicio de Sesión | CU02 | Usuario | El usuario ingresa credenciales → el sistema valida → genera token de sesión → redirige al panel | FA: Credenciales incorrectas → mensaje de error. FA: 5 intentos fallidos → cuenta bloqueada 15 min. |
+| DS-03: Validación Institucional | CU04 | Institucion, Usuario, Administrador | El administrador revisa solicitud → valida institución → activa cuenta del usuario | FA: Institución no pública o fuera de Medellín → solicitud rechazada y usuario notificado. |
+| DS-04: Responder Cuestionario | CU07, CU08 | Cuestionario, Pregunta, Respuesta, Estudiante | El estudiante inicia cuestionario → responde preguntas → el sistema guarda cada respuesta → al finalizar genera resultado | FA: Pregunta obligatoria sin responder → bloquea avance. FA: Guardar y salir → progreso guardado, puede retomar. |
+| DS-05: Generar Resultado Vocacional | CU12, CU13 | Resultado, Carrera, Estudiante | El sistema detecta cuestionario completo → calcula porcentajes → genera perfil vocacional → sugiere carreras | FA: Cuestionario incompleto → no se genera resultado. FA: Error de cálculo → notifica al usuario y registra el error. |
+| DS-06: Descargar Informe PDF | CU15 | Resultado, Orientador | El orientador selecciona estudiante → solicita PDF → el sistema genera el informe → descarga automática | FA: Resultado no disponible → mensaje 'El estudiante no ha completado el cuestionario'. |
+| DS-07: Consultar Tendencias Laborales | CU18, CU19 | TendenciaLaboral, Carrera | El usuario accede al módulo → el sistema carga datos actualizados → muestra carreras demandadas y riesgo IA | FA: Datos desactualizados (>6 meses) → el sistema muestra aviso de actualización pendiente. |
+| DS-08: Gestionar Permisos | CU06, CU26 | Administrador, Usuario, Rol | El administrador accede a permisos → selecciona rol → asigna/revoca accesos → el sistema confirma cambios | FA: Rol sin usuarios asignados → el sistema advierte antes de modificar. FA: Error al guardar → notifica y revierte. |
+| DS-09: Crear y Publicar Encuesta | CU28 | Encuesta, Administrador | El administrador crea encuesta → agrega preguntas → publica → el sistema cambia estado a 'publicada' | FA: Encuesta sin preguntas → no se puede publicar. FA: Error al guardar → notifica y mantiene en borrador. |
+| DS-10: Asignar Encuesta a Orientadores | CU31 | Encuesta, Orientador, Administrador | El administrador selecciona encuesta publicada → elige orientadores → el sistema valida permisos → envía acceso | FA: Orientador sin permisos suficientes → excluido del envío con aviso. FA: Error de envío → reintento automático. |
+| DS-11: Responder Encuesta Institucional | CU32 | Encuesta, Respuesta_Encuesta, Orientador | El orientador accede a encuesta asignada → responde preguntas → envía → el sistema registra y confirma | FA: Pregunta obligatoria sin responder → bloquea envío. FA: Encuesta cerrada → bloquea envío y notifica. |
+| DS-12: Exportar Reporte Grupal | CU27 | Resultado, Orientador, Estudiante | El orientador accede al panel → selecciona grupo → solicita reporte → el sistema genera y descarga PDF/Excel | FA: Grupo sin resultados → mensaje 'No hay datos disponibles para exportar'. |
+| DS-13: Enviar Comentario o Sugerencia | CU33 | Estudiante, Administrador | El estudiante accede al formulario → escribe comentario → envía → el sistema registra y notifica al administrador | FA: Campo vacío → bloquea envío con mensaje de validación. FA: Error al registrar → invita a reintentar. |
+| DS-14: Visualizar Estadísticas Globales | CU24 | Administrador, EstadisticaEncuesta | El administrador accede al panel → el sistema carga métricas → muestra estadísticas con filtros disponibles | FA: Sin datos suficientes → muestra panel vacío con mensaje informativo. |
