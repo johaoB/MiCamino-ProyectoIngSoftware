@@ -42,37 +42,37 @@ R\\= Si
 ## Entrada #03 - 
 **¿Que Hicimos?**
 
-R\\= 
+R\\= Conectamos la base de datos a la pagina
 
 **¿Que Problema encontramos?**
 
-R\\=
+R\\= Al ser nuestra primera vez conectando una base de datos a una pagina hubo que realizar una exhaustiva y larga investigación.
 
 **¿Como lo resolvimos?**
 
-R\\=
+R\\= Consultando con diferentes ias y videos de youtube.
 
 
 **¿Usamos IA?**
 
-R\\=
+R\\= Si
 
 &nbsp;
 
 ## Entrada #04 - 
 **¿Que Hicimos?**
 
-R\\= 
+R\\= Implementamos el CRUD a las tablas de la base de datos de nuestros respectivos módulos.
 
 **¿Que Problema encontramos?**
 
-R\\=
+R\\= Durante el seguimiento del sistema, se detecto que algunas operaciones del CRUD no estaban ejecutando las consultas correctamente, generando inconsistencias en los datos almacenados
 
 **¿Como lo resolvimos?**
 
-R\\=
+R\\= Haciendo seguimiento a los diferentes procesos verificando que las consultas para el crud se hicieran correctamente
 
 
 **¿Usamos IA?**
 
-R\\=
+R\\= Si

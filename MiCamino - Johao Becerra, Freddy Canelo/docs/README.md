@@ -6,11 +6,25 @@
 <br>
 
 # Que Modulo se Implemento?
-### Para este proyecto se implemento el modulo B, el cual contiene (Gestion de Usuario, Encuestas y Mercado Laboral)
+### Para este proyecto se implemento el modulo A, el cual contiene (Orientación Vocacional y Cuestionarios) y el modulo B, el cual contiene (Gestion de Usuario, Encuestas y Mercado Laboral)
 <br>
 
 # Que tablas cubre el modulo Implementado?
-### El modulo contiene 14 tablas las cuales son:
+
+### El modulo A contiene 10 tablas las cuales son:
+
+- ### Cuestionario (maestra)
+- ### Pregunta (maestra)
+- ### Opcion_Respuesta (maestra)
+- ### Area (maestra)
+- ### Carrera (maestra)
+- ### Intento_Cuestionario (transaccional)
+- ### Respuesta (transaccional)
+- ### Resultado (transaccional)
+- ### Afinidad_Academica (transaccional)
+- ### Recomendacion (transaccional)
+
+### El modulo B contiene 14 tablas las cuales son:
 - ### Usuario (maestra)
 - ### Rol (maestra)
 - ### Institucion (maestra)
@@ -28,7 +42,7 @@
 <br>
 
 # Que framework se utilizo para realizar el proyecto?
-### Para este proyecto se usaron dos Framework's, uno para el Front-end y otro para el Back-end
+### Para este proyecto se usaron en ambos modulos dos Framework's, uno para el Front-end y otro para el Back-end
 - ### Front-end: React para la vista, creando la carpeta Client que contiene las paginas 
 - ### Back-end: Node.js + Express para el Modelo y el Controlador, creando la carpeta Server que contiene la logica de la aplicacion y la vista (Front-end) sepa que debe mostrar en cada interaccion sobre la pagina
 <br>
@@ -39,11 +53,15 @@
 
 ### **Paso a Paso:**
 
+- ### Iniciamos el Xampp activando apache y mysql
 - ### Abrimos el Simbolo del Sistema, CMD o en la Terminal de nuestro dispositivo
 - ### Nos ubicamos en la direccion de la Carpeta Proyecto
-- ### Ejecutamos el comando: npm  run install:all
+- ###  Para el modulo A: Ejecutamos el comando: npm install y luego el comando npm run install:all
+- ###  Para el modulo B: Ejecutamos el comando: npm run install:all
 - ### Luego el comando: npm run dev
 - ### Y listo, el proyecto se estara ejecutando en la ruta que se te proporciona en el cmd, la copias y la pegas en tu navegador para ingresar en MiCamino
 <br>
 
 # Cual es el repositorio de tu compañero?
+
+# Para este proyecto se utilizó el mismo repositorio y se subieron los modulos por separado.
