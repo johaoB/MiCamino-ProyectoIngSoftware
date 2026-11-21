@@ -1,0 +1,592 @@
+{
+  "info": {
+    "name": "MiCamino-QA",
+    "description": "Colección de pruebas de la ficha de plan y registro de ejecución (Bloques 2 y 3). Requiere backend en http://localhost:5000 y BD con micamino.sql + seed.sql recién importados.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Bloque 3 · Verificación de códigos HTTP y tiempos (API-01 a API-04)",
+      "item": [
+        {
+          "name": "API-01 · GET /carreras/1 (200 OK)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/carreras/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carreras",
+                "1"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Tiempo de respuesta <= 2000 ms\", () => pm.expect(pm.response.responseTime).to.be.below(2001));",
+                  "pm.test(\"Devuelve la carrera 1\", () => pm.expect(pm.response.json().id_carrera).to.eql(1));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-02 · POST /carreras (201 Created)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/carreras",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carreras"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ingeniería Biomédica\",\n  \"descripcion\": \"Aplicación de la ingeniería a la salud.\",\n  \"duracion\": \"5 años\",\n  \"nivel_riesgo_automatizacion\": \"Bajo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Tiempo de respuesta <= 2000 ms\", () => pm.expect(pm.response.responseTime).to.be.below(2001));",
+                  "pm.test(\"Mensaje de creación\", () => pm.expect(pm.response.json().mensaje).to.include(\"creada\"));",
+                  "pm.collectionVariables.set(\"carreraId\", pm.response.json().carrera.id_carrera);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-03 · POST /carreras sin nombre (400 Bad Request)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/carreras",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carreras"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"Carrera sin nombre\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Tiempo de respuesta <= 2000 ms\", () => pm.expect(pm.response.responseTime).to.be.below(2001));",
+                  "pm.test(\"Mensaje de validación\", () => pm.expect(pm.response.json().mensaje).to.include(\"obligatorio\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-04 · GET /carreras/9999 (404 Not Found)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/carreras/9999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carreras",
+                "9999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Tiempo de respuesta <= 2000 ms\", () => pm.expect(pm.response.responseTime).to.be.below(2001));",
+                  "pm.test(\"Mensaje de no encontrada\", () => pm.expect(pm.response.json().mensaje).to.include(\"no encontrada\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bloque 2 · Casos de prueba funcionales (CP-01 a CP-06)",
+      "item": [
+        {
+          "name": "CP-01a · POST /carreras válida (201)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/carreras",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carreras"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ingeniería Mecatrónica\",\n  \"descripcion\": \"Diseño de sistemas mecánicos y electrónicos.\",\n  \"duracion\": \"5 años\",\n  \"nivel_riesgo_automatizacion\": \"Bajo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Tiempo de respuesta <= 2000 ms\", () => pm.expect(pm.response.responseTime).to.be.below(2001));",
+                  "pm.collectionVariables.set(\"cp01Id\", pm.response.json().carrera.id_carrera);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CP-01b · GET /carreras/{id} devuelve los mismos datos (200)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/carreras/{{cp01Id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carreras",
+                "{{cp01Id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Tiempo de respuesta <= 2000 ms\", () => pm.expect(pm.response.responseTime).to.be.below(2001));",
+                  "pm.test(\"Mismos datos guardados\", () => pm.expect(pm.response.json().nombre).to.eql(\"Ingeniería Mecatrónica\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CP-02 · POST /carreras sin nombre (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/carreras",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carreras"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"sin nombre\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Tiempo de respuesta <= 2000 ms\", () => pm.expect(pm.response.responseTime).to.be.below(2001));",
+                  "pm.test(\"Mensaje exacto\", () => pm.expect(pm.response.json().mensaje).to.eql(\"El nombre de la carrera es obligatorio.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CP-03 · POST /users con correo existente (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Luis Gómez\",\n  \"email\": \"ana.gomez@demo.edu.co\",\n  \"password\": \"x1\",\n  \"role\": \"usuario\",\n  \"institucion\": \"IE San José\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Tiempo de respuesta <= 2000 ms\", () => pm.expect(pm.response.responseTime).to.be.below(2001));",
+                  "pm.test(\"Mensaje exacto\", () => pm.expect(pm.response.json().message).to.eql(\"El correo ya está registrado\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CP-04 · POST /auth/login contraseña incorrecta (401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ana.gomez@demo.edu.co\",\n  \"password\": \"incorrecta\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 401\", () => pm.response.to.have.status(401));",
+                  "pm.test(\"Tiempo de respuesta <= 2000 ms\", () => pm.expect(pm.response.responseTime).to.be.below(2001));",
+                  "pm.test(\"Mensaje exacto\", () => pm.expect(pm.response.json().message).to.eql(\"Credenciales incorrectas\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CP-05a · POST /users registra cuenta nueva (201, pendiente)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Luis Gómez\",\n  \"email\": \"{{mailNuevo}}\",\n  \"password\": \"luis123\",\n  \"role\": \"usuario\",\n  \"institucion\": \"IE San José\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Tiempo de respuesta <= 2000 ms\", () => pm.expect(pm.response.responseTime).to.be.below(2001));",
+                  "pm.test(\"Estado pendiente\", () => pm.expect(pm.response.json().estado).to.eql(\"pendiente\"));",
+                  "pm.collectionVariables.set(\"nuevoId\", pm.response.json().id);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"mailNuevo\", \"luis\" + Date.now() + \"@demo.edu.co\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CP-05b · POST /auth/login cuenta pendiente (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{mailNuevo}}\",\n  \"password\": \"luis123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Tiempo de respuesta <= 2000 ms\", () => pm.expect(pm.response.responseTime).to.be.below(2001));",
+                  "pm.test(\"Mensaje de pendiente\", () => pm.expect(pm.response.json().message).to.include(\"pendiente\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CP-05c · PUT /admin/aprobar/{id} (200)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/aprobar/{{nuevoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "aprobar",
+                "{{nuevoId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Tiempo de respuesta <= 2000 ms\", () => pm.expect(pm.response.responseTime).to.be.below(2001));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CP-05d · POST /auth/login tras aprobar (200)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{mailNuevo}}\",\n  \"password\": \"luis123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Tiempo de respuesta <= 2000 ms\", () => pm.expect(pm.response.responseTime).to.be.below(2001));",
+                  "pm.test(\"Login exitoso\", () => pm.expect(pm.response.json().message).to.eql(\"Login exitoso\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CP-06 · DELETE /carreras/1 referenciada (409)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/carreras/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carreras",
+                "1"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Tiempo de respuesta <= 2000 ms\", () => pm.expect(pm.response.responseTime).to.be.below(2001));",
+                  "pm.test(\"Mensaje de referencia\", () => pm.expect(pm.response.json().mensaje).to.include(\"referenciada\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api"
+    },
+    {
+      "key": "carreraId",
+      "value": ""
+    },
+    {
+      "key": "cp01Id",
+      "value": ""
+    },
+    {
+      "key": "nuevoId",
+      "value": ""
+    },
+    {
+      "key": "mailNuevo",
+      "value": ""
+    }
+  ]
+}
