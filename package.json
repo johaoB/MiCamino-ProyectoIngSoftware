@@ -1,0 +1,24 @@
+{
+  "name": "micamino",
+  "version": "1.0.0",
+  "description": "Mi Camino – Orientación Vocacional (proyecto unificado: Módulo B login/roles + Módulo A cuestionario/resultados)",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently --kill-others-on-fail --names \"SERVER,CLIENT\" --prefix-colors \"cyan,magenta\" \"npm run server\" \"npm run client\"",
+    "start": "npm run dev",
+    "server": "npm run dev --workspace server",
+    "client": "npm run dev --workspace client",
+    "build": "npm run build --workspace client",
+    "db:schema": "mysql -u root < database/micamino.sql",
+    "db:seed": "mysql -u root micamino < database/seed.sql",
+    "db:setup": "npm run db:schema && npm run db:seed",
+    "install:all": "npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
